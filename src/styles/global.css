@@ -1,0 +1,174 @@
+@import 'tailwindcss';
+
+/*
+ * Fontes self-hosted com nome de arquivo estável (public/fonts), o que permite
+ * o <link rel="preload"> no BaseLayout. Subset latin — cobre pt-BR e inglês.
+ * Para outros alfabetos, volte a importar os pacotes @fontsource-variable.
+ */
+@font-face {
+  font-family: 'Geist Variable';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url('/fonts/geist-latin-var.woff2') format('woff2-variations');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304,
+    U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'JetBrains Mono Variable';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 800;
+  src: url('/fonts/jetbrains-mono-latin-var.woff2') format('woff2-variations');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304,
+    U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/*
+ * Terminal Ink — design tokens.
+ * O tema é trocado pelo atributo data-theme no <html>; as utilities do Tailwind
+ * apontam para as variáveis, então nenhum componente precisa de variante `dark:`.
+ */
+@custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
+
+:root,
+[data-theme='light'] {
+  --canvas: #fbfbfc;
+  --surface: #ffffff;
+  --elevated: #f3f5f7;
+  --line: #e2e5ea;
+  --line-strong: #cbd1d9;
+  --ink: #0b0c0e;
+  --muted: #55606f;
+  --accent: #0e7490;
+  --accent-soft: rgb(14 116 144 / 0.1);
+  --on-accent: #ffffff;
+  --selection: rgb(14 116 144 / 0.18);
+}
+
+[data-theme='dark'] {
+  --canvas: #0b0c0e;
+  --surface: #101216;
+  --elevated: #15181d;
+  --line: #21252c;
+  --line-strong: #2f353e;
+  --ink: #e6e8eb;
+  --muted: #98a1ae;
+  --accent: #22d3ee;
+  --accent-soft: rgb(34 211 238 / 0.12);
+  --on-accent: #04252c;
+  --selection: rgb(34 211 238 / 0.22);
+}
+
+@theme inline {
+  --color-canvas: var(--canvas);
+  --color-surface: var(--surface);
+  --color-elevated: var(--elevated);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-on-accent: var(--on-accent);
+
+  --font-sans: 'Geist Variable', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono Variable', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* Escala fluida usada nos títulos das seções e no hero. */
+  --text-display: clamp(2.5rem, 1.6rem + 4.2vw, 5.25rem);
+  --text-display--line-height: 0.98;
+  --text-display--letter-spacing: -0.035em;
+  --text-headline: clamp(1.75rem, 1.3rem + 2vw, 2.75rem);
+  --text-headline--line-height: 1.1;
+  --text-headline--letter-spacing: -0.02em;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    /* Compensa o header fixo ao pular via âncora. */
+    scroll-padding-top: 5.5rem;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--canvas);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-synthesis-weight: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::selection {
+    background-color: var(--selection);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  /* Sem transição na troca de tema para evitar "arrasto" de cor em toda a página. */
+  [data-theme-switching] * {
+    transition: none !important;
+  }
+}
+
+@layer components {
+  /* Container padrão das seções: mobile-first, respiro generoso no desktop. */
+  .shell {
+    width: 100%;
+    max-width: 72rem;
+    margin-inline: auto;
+    padding-inline: 1.25rem;
+  }
+
+  @media (width >= 48rem) {
+    .shell {
+      padding-inline: 2.5rem;
+    }
+  }
+
+  /*
+   * Entrada por scroll. Só esconde o conteúdo quando há JS (`data-js` no <html>),
+   * então sem JavaScript a página continua legível.
+   */
+  [data-js] [data-reveal]:not([data-revealed]) {
+    opacity: 0;
+    transform: translateY(1.25rem);
+  }
+
+  [data-reveal] {
+    transition:
+      opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+      transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+    transition-delay: var(--reveal-delay, 0ms);
+  }
+
+  /* Grid de linhas finas ao fundo do hero. */
+  .grid-backdrop {
+    background-image:
+      linear-gradient(to right, var(--line) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--line) 1px, transparent 1px);
+    background-size: 4rem 4rem;
+    mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 20%, transparent 75%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

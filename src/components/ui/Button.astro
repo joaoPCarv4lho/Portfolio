@@ -1,0 +1,41 @@
+---
+interface Props {
+  href?: string;
+  variant?: 'primary' | 'ghost';
+  external?: boolean;
+  /** Renderiza como desabilitado (usado nos links de projeto ainda sem URL). */
+  disabled?: boolean;
+  class?: string;
+  [key: string]: unknown;
+}
+
+const {
+  href,
+  variant = 'primary',
+  external = false,
+  disabled = false,
+  class: className = '',
+  ...rest
+} = Astro.props;
+
+const base =
+  'group inline-flex items-center justify-center gap-2 rounded-md px-5 py-2.5 font-mono text-sm transition-all duration-200';
+
+const styles = {
+  primary: 'bg-accent text-on-accent hover:brightness-110 active:scale-[0.98]',
+  ghost: 'border border-line text-ink hover:border-accent hover:text-accent active:scale-[0.98]',
+} as const;
+
+const Tag = disabled ? 'span' : href ? 'a' : 'button';
+const externalAttrs = external && !disabled ? { target: '_blank', rel: 'noopener noreferrer' } : {};
+---
+
+<Tag
+  href={disabled ? undefined : href}
+  aria-disabled={disabled ? 'true' : undefined}
+  class:list={[base, styles[variant], disabled && 'cursor-not-allowed opacity-40', className]}
+  {...externalAttrs}
+  {...rest}
+>
+  <slot />
+</Tag>

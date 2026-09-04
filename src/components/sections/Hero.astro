@@ -1,0 +1,137 @@
+---
+import Button from '../ui/Button.astro';
+import Icon from '../ui/Icon.astro';
+import { contact, site } from '../../data/site';
+import { heroStack } from '../../data/skills';
+import { getLangFromUrl, useTranslations } from '../../i18n/utils';
+
+const t = useTranslations(getLangFromUrl(Astro.url));
+---
+
+<section id="topo" class="relative flex min-h-[100svh] items-center overflow-hidden pt-24 pb-16">
+  <div class="grid-backdrop pointer-events-none absolute inset-0 -z-10" aria-hidden="true"></div>
+
+  <div class="shell w-full">
+    <p class="mb-6 flex items-center gap-2 font-mono text-sm text-muted" data-reveal>
+      <span class="relative flex size-2">
+        <span class="absolute inline-flex size-full animate-ping rounded-full bg-accent opacity-60"></span>
+        <span class="relative inline-flex size-2 rounded-full bg-accent"></span>
+      </span>
+      {site.availability}
+    </p>
+
+    <p class="mb-3 font-mono text-sm text-accent" data-reveal style="--reveal-delay:60ms">
+      {t('hero.greeting')}
+    </p>
+
+    <h1
+      class="text-display max-w-[15ch] font-semibold text-balance"
+      data-reveal
+      style="--reveal-delay:120ms"
+    >
+      João Paulo<br />Guedes Carvalho<span
+        class="ml-2 inline-block w-2 animate-[caret_1.1s_steps(1)_infinite] bg-accent align-baseline md:w-3"
+        style="height:0.78em"
+        aria-hidden="true"></span>
+    </h1>
+
+    <p
+      class="mt-8 max-w-xl text-lg text-muted text-pretty md:text-xl"
+      data-reveal
+      style="--reveal-delay:180ms"
+    >
+      Desenvolvedor <strong class="font-medium text-ink">back-end e full-stack</strong> com 2+ anos
+      construindo APIs, integrações e sistemas para a indústria — de Python e FastAPI ao chão de
+      fábrica.
+    </p>
+
+    <p
+      class="mt-4 flex items-center gap-2 font-mono text-sm text-muted"
+      data-reveal
+      style="--reveal-delay:220ms"
+    >
+      <Icon name="mapPin" class="size-4 text-accent" />
+      {site.location}
+    </p>
+
+    <div class="mt-10 flex flex-wrap items-center gap-3" data-reveal style="--reveal-delay:280ms">
+      <Button href="#projetos">
+        {t('hero.cta.projects')}
+        <Icon name="arrowRight" class="size-4 transition-transform group-hover:translate-x-0.5" />
+      </Button>
+
+      <Button href={`mailto:${contact.email}`} variant="ghost">
+        {t('hero.cta.contact')}
+      </Button>
+
+      <div class="flex items-center gap-1">
+        <a
+          href={contact.github}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="grid size-10 place-items-center rounded-md text-muted transition-colors hover:text-accent"
+          aria-label="GitHub"
+        >
+          <Icon name="github" class="size-5" />
+        </a>
+        <a
+          href={contact.linkedin}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="grid size-10 place-items-center rounded-md text-muted transition-colors hover:text-accent"
+          aria-label="LinkedIn"
+        >
+          <Icon name="linkedin" class="size-5" />
+        </a>
+      </div>
+    </div>
+
+    <ul
+      class="mt-12 flex flex-wrap gap-x-5 gap-y-2 font-mono text-xs text-muted"
+      data-reveal
+      style="--reveal-delay:340ms"
+      aria-label="Principais tecnologias"
+    >
+      {
+        heroStack.map((item) => (
+          <li class="flex items-center gap-2">
+            <span class="text-accent/50">/</span>
+            {item}
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+
+  <a
+    href="#sobre"
+    class="scroll-hint absolute inset-x-0 bottom-6 mx-auto w-fit items-center gap-2 font-mono text-xs text-muted transition-colors hover:text-accent"
+  >
+    {t('hero.scroll')}
+    <Icon name="arrowDown" class="size-3.5 animate-bounce" />
+  </a>
+</section>
+
+<style>
+  /* A dica de rolagem só cabe em telas altas o bastante; some no resto. */
+  .scroll-hint {
+    display: none;
+  }
+
+  @media (width >= 48rem) and (height >= 44rem) {
+    .scroll-hint {
+      display: flex;
+    }
+  }
+
+  @keyframes caret {
+    0%,
+    50% {
+      opacity: 1;
+    }
+    51%,
+    100% {
+      opacity: 0;
+    }
+  }
+</style>

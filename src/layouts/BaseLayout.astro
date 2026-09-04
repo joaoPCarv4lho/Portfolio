@@ -1,0 +1,119 @@
+---
+import '../styles/global.css';
+
+import Header from '../components/layout/Header.astro';
+import Footer from '../components/layout/Footer.astro';
+import { site } from '../data/site';
+import { getLangFromUrl, useTranslations } from '../i18n/utils';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const { title = `${site.name} — ${site.role}`, description = site.description } = Astro.props;
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const canonical = new URL(Astro.url.pathname, Astro.site ?? site.url);
+const ogImage = new URL('/og-image.png', Astro.site ?? site.url); // PLACEHOLDER: 1200×630
+
+// JSON-LD ajuda o Google a entender que a página descreve uma pessoa.
+const personSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: site.name,
+  jobTitle: site.role,
+  url: site.url,
+  address: { '@type': 'PostalAddress', addressLocality: 'Joinville', addressRegion: 'SC', addressCountry: 'BR' },
+  knowsAbout: ['Python', 'FastAPI', 'PostgreSQL', 'TypeScript', 'React', 'Integração de sistemas'],
+};
+---
+
+<!doctype html>
+<html lang={lang} data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="canonical" href={canonical} />
+
+    {/* As fontes são o recurso crítico do LCP — descobri-las só após o CSS atrasa a pintura. */}
+    <link rel="preload" href="/fonts/geist-latin-var.woff2" as="font" type="font/woff2" crossorigin />
+    <link
+      rel="preload"
+      href="/fonts/jetbrains-mono-latin-var.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <meta name="generator" content={Astro.generator} />
+
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="author" content={site.name} />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:locale" content="pt_BR" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <meta name="theme-color" content="#0b0c0e" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#fbfbfc" media="(prefers-color-scheme: light)" />
+
+    <script is:inline set:html={JSON.stringify(personSchema)} type="application/ld+json" />
+
+    {/* Roda antes da primeira pintura: evita o flash de tema errado. */}
+    <script is:inline>
+      (() => {
+        const stored = localStorage.getItem('theme');
+        const prefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
+        document.documentElement.dataset.theme = stored ?? (prefersLight ? 'light' : 'dark');
+        // Marca que há JS: as animações de entrada só escondem conteúdo se puderem revelá-lo.
+        document.documentElement.dataset.js = '';
+      })();
+    </script>
+  </head>
+
+  <body>
+    <a
+      href="#conteudo"
+      class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:rounded-md focus:bg-accent focus:px-4 focus:py-2 focus:font-mono focus:text-sm focus:text-on-accent"
+    >
+      {t('nav.skip')}
+    </a>
+
+    <Header />
+
+    <main id="conteudo">
+      <slot />
+    </main>
+
+    <Footer />
+
+    {/* Revela seções ao entrar na viewport; sem JS o conteúdo já está visível. */}
+    <script>
+      const targets = document.querySelectorAll<HTMLElement>('[data-reveal]');
+      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      if (reduced || !('IntersectionObserver' in window)) {
+        targets.forEach((el) => el.setAttribute('data-revealed', ''));
+      } else {
+        const observer = new IntersectionObserver(
+          (entries) => {
+            for (const entry of entries) {
+              if (!entry.isIntersecting) continue;
+              entry.target.setAttribute('data-revealed', '');
+              observer.unobserve(entry.target);
+            }
+          },
+          { rootMargin: '0px 0px -12% 0px', threshold: 0.1 },
+        );
+        targets.forEach((el) => observer.observe(el));
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,76 @@
+---
+import Section from '../ui/Section.astro';
+import SectionHeading from '../ui/SectionHeading.astro';
+import { certifications, education, site } from '../../data/site';
+import { getLangFromUrl, useTranslations } from '../../i18n/utils';
+
+const t = useTranslations(getLangFromUrl(Astro.url));
+---
+
+<Section id="sobre">
+  <SectionHeading index="01" title={t('about.title')}>
+    Da mecatrônica para o software — sem largar nenhum dos dois.
+  </SectionHeading>
+
+  <div class="grid gap-12 lg:grid-cols-[1.4fr_1fr] lg:gap-16">
+    <div class="space-y-5 text-base leading-relaxed text-muted text-pretty md:text-lg" data-reveal>
+      <p>
+        Sou desenvolvedor em <strong class="font-medium text-ink">{site.location}</strong>, com mais
+        de dois anos construindo back-ends em Python e interfaces em TypeScript. Comecei pela
+        mecatrônica industrial e migrei para o software levando junto o interesse por sistemas que
+        precisam funcionar em produção, com gente dependendo deles no turno seguinte.
+      </p>
+
+      <p>
+        Na prática, isso significa APIs em <strong class="font-medium text-ink">FastAPI</strong> com
+        modelagem cuidadosa em PostgreSQL, arquitetura em camadas que aguenta a regra de negócio
+        crescer, e integrações — de WebSocket a socket TCP conversando com LabVIEW e CLP. Gosto de
+        problemas onde o desafio não é só o código: é entender o processo que existia antes dele.
+      </p>
+
+      <p>
+        {/* PLACEHOLDER: adicione aqui um parágrafo pessoal — o que te move, o que você está
+        estudando agora, o que procura na próxima posição. */}
+        Fora do trabalho, mantenho projetos próprios para testar ideias sem cliente esperando — o
+        sistema da liga de futebol amador nasceu assim.
+      </p>
+    </div>
+
+    <div class="space-y-10" data-reveal style="--reveal-delay:120ms">
+      <div>
+        <h3 class="mb-4 font-mono text-xs tracking-widest text-accent uppercase">
+          {t('about.education')}
+        </h3>
+        <ul class="space-y-4">
+          {
+            education.map((item) => (
+              <li class="border-l border-line pl-4">
+                <p class="font-medium text-ink">{item.course}</p>
+                <p class="text-sm text-muted">{item.institution}</p>
+                <p class="mt-0.5 font-mono text-xs text-muted/70">{item.period}</p>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+
+      <div>
+        <h3 class="mb-4 font-mono text-xs tracking-widest text-accent uppercase">
+          {t('about.certifications')}
+        </h3>
+        <ul class="space-y-4">
+          {
+            certifications.map((item) => (
+              <li class="border-l border-line pl-4">
+                <p class="font-medium text-ink">{item.name}</p>
+                <p class="text-sm text-muted">
+                  {item.issuer} · {item.year}
+                </p>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </div>
+  </div>
+</Section>

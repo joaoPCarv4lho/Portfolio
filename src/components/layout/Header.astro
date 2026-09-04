@@ -1,0 +1,133 @@
+---
+import ThemeToggle from './ThemeToggle.astro';
+import { nav, site } from '../../data/site';
+import { getLangFromUrl, useTranslations } from '../../i18n/utils';
+
+const t = useTranslations(getLangFromUrl(Astro.url));
+---
+
+<header
+  id="site-header"
+  class="fixed inset-x-0 top-0 z-40 border-b border-transparent transition-[background-color,border-color,backdrop-filter] duration-300 data-[scrolled]:border-line data-[scrolled]:bg-canvas/80 data-[scrolled]:backdrop-blur-lg"
+>
+  <div class="shell flex h-16 items-center justify-between gap-4">
+    <a
+      href="#topo"
+      class="font-mono text-sm font-medium tracking-tight text-ink transition-colors hover:text-accent"
+    >
+      <span class="text-accent">~/</span>{site.domain.replace(/\..*$/, '')}
+    </a>
+
+    <div class="flex items-center gap-2">
+      <nav aria-label={t('nav.menu')} class="hidden md:block">
+        <ul class="flex items-center gap-1">
+          {
+            nav.map((item) => (
+              <li>
+                <a
+                  href={`#${item.id}`}
+                  class="group flex items-center gap-1.5 rounded-md px-3 py-2 font-mono text-[0.8125rem] text-muted transition-colors hover:text-ink"
+                  data-nav-link={item.id}
+                >
+                  <span class="text-accent/60 transition-colors group-hover:text-accent">{item.index}</span>
+                  {item.label}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+
+      <ThemeToggle />
+
+      <button
+        type="button"
+        id="menu-toggle"
+        class="grid size-9 place-items-center rounded-md border border-line text-muted transition-colors hover:border-line-strong hover:text-ink md:hidden"
+        aria-label={t('nav.open')}
+        aria-expanded="false"
+        aria-controls="mobile-menu"
+      >
+        <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true">
+          <path d="M4 7h16M4 12h16M4 17h16"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  {/* Menu mobile: painel abaixo do header, fechado por padrão. */}
+  <nav
+    id="mobile-menu"
+    aria-label={t('nav.menu')}
+    class="hidden border-t border-line bg-canvas/95 backdrop-blur-lg md:!hidden"
+  >
+    <ul class="shell flex flex-col py-2">
+      {
+        nav.map((item) => (
+          <li>
+            <a
+              href={`#${item.id}`}
+              class="flex items-center gap-3 border-b border-line/60 py-4 font-mono text-base text-ink last:border-b-0"
+              data-mobile-link
+            >
+              <span class="text-accent">{item.index}</span>
+              {item.label}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </nav>
+</header>
+
+<script>
+  const header = document.getElementById('site-header');
+  const toggle = document.getElementById('menu-toggle');
+  const menu = document.getElementById('mobile-menu');
+
+  // Fundo do header só aparece depois que a página rola.
+  const sentinel = () => {
+    if (!header) return;
+    header.toggleAttribute('data-scrolled', window.scrollY > 8);
+  };
+  sentinel();
+  window.addEventListener('scroll', sentinel, { passive: true });
+
+  const setMenu = (open: boolean) => {
+    if (!menu || !toggle) return;
+    menu.classList.toggle('hidden', !open);
+    toggle.setAttribute('aria-expanded', String(open));
+    toggle.setAttribute('aria-label', open ? 'Fechar menu' : 'Abrir menu');
+  };
+
+  toggle?.addEventListener('click', () => setMenu(menu?.classList.contains('hidden') ?? true));
+  menu?.querySelectorAll('[data-mobile-link]').forEach((link) => link.addEventListener('click', () => setMenu(false)));
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') setMenu(false);
+  });
+
+  // Destaca no menu a seção visível no momento.
+  const links = new Map<string, Element>();
+  document.querySelectorAll('[data-nav-link]').forEach((el) => {
+    const id = el.getAttribute('data-nav-link');
+    if (id) links.set(id, el);
+  });
+
+  const sections = [...links.keys()]
+    .map((id) => document.getElementById(id))
+    .filter((el): el is HTMLElement => el !== null);
+
+  if (sections.length && 'IntersectionObserver' in window) {
+    const spy = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          links.forEach((el) => el.classList.remove('!text-ink'));
+          links.get(entry.target.id)?.classList.add('!text-ink');
+        }
+      },
+      { rootMargin: '-45% 0px -50% 0px' },
+    );
+    sections.forEach((section) => spy.observe(section));
+  }
+</script>

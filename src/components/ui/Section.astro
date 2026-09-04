@@ -1,0 +1,20 @@
+---
+interface Props {
+  id: string;
+  /** Rótulo acessível quando a seção não tem um <h2> visível próprio. */
+  label?: string;
+  class?: string;
+}
+
+const { id, label, class: className = '' } = Astro.props;
+---
+
+<section
+  id={id}
+  aria-label={label}
+  class:list={['scroll-mt-24 border-t border-line py-20 md:py-28', className]}
+>
+  <div class="shell">
+    <slot />
+  </div>
+</section>

@@ -1,0 +1,103 @@
+---
+import Section from '../ui/Section.astro';
+import SectionHeading from '../ui/SectionHeading.astro';
+import Button from '../ui/Button.astro';
+import Icon from '../ui/Icon.astro';
+import { contact } from '../../data/site';
+import { getLangFromUrl, useTranslations } from '../../i18n/utils';
+
+const t = useTranslations(getLangFromUrl(Astro.url));
+---
+
+<Section id="contato">
+  <SectionHeading index="05" title={t('contact.title')} subtitle={t('contact.subtitle')}>
+    Vamos conversar.
+  </SectionHeading>
+
+  <div class="grid gap-10 lg:grid-cols-[1fr_auto] lg:items-end" data-reveal>
+    <div>
+      <a
+        href={`mailto:${contact.email}`}
+        class="inline-block font-mono text-xl break-all text-ink transition-colors hover:text-accent md:text-3xl"
+      >
+        {contact.email}
+      </a>
+
+      <div class="mt-8 flex flex-wrap items-center gap-3">
+        <Button href={`mailto:${contact.email}`}>
+          <Icon name="mail" class="size-4" />
+          {t('contact.email')}
+        </Button>
+
+        <button
+          type="button"
+          id="copy-email"
+          data-email={contact.email}
+          class="group inline-flex items-center justify-center gap-2 rounded-md border border-line px-5 py-2.5 font-mono text-sm text-ink transition-all duration-200 hover:border-accent hover:text-accent active:scale-[0.98]"
+        >
+          <Icon name="copy" class="size-4 group-data-[copied]:hidden" />
+          <Icon name="check" class="hidden size-4 group-data-[copied]:block" />
+          <span data-copy-label={t('contact.copy')} data-copied-label={t('contact.copied')}>
+            {t('contact.copy')}
+          </span>
+        </button>
+
+        <Button href={contact.resume} variant="ghost">
+          <Icon name="download" class="size-4" />
+          {t('contact.resume')}
+        </Button>
+      </div>
+    </div>
+
+    <ul class="flex flex-col gap-3 font-mono text-sm">
+      <li>
+        <a
+          href={contact.github}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="group inline-flex items-center gap-3 text-muted transition-colors hover:text-accent"
+        >
+          <Icon name="github" class="size-4" />
+          GitHub
+          <Icon name="arrowRight" class="size-3.5 transition-transform group-hover:translate-x-1" />
+        </a>
+      </li>
+      <li>
+        <a
+          href={contact.linkedin}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="group inline-flex items-center gap-3 text-muted transition-colors hover:text-accent"
+        >
+          <Icon name="linkedin" class="size-4" />
+          LinkedIn
+          <Icon name="arrowRight" class="size-3.5 transition-transform group-hover:translate-x-1" />
+        </a>
+      </li>
+    </ul>
+  </div>
+</Section>
+
+<script>
+  const button = document.getElementById('copy-email');
+  const label = button?.querySelector<HTMLElement>('[data-copy-label]');
+
+  button?.addEventListener('click', async () => {
+    const email = button.dataset.email;
+    if (!email || !label) return;
+
+    try {
+      await navigator.clipboard.writeText(email);
+      button.setAttribute('data-copied', '');
+      label.textContent = label.dataset.copiedLabel ?? 'Copiado!';
+
+      setTimeout(() => {
+        button.removeAttribute('data-copied');
+        label.textContent = label.dataset.copyLabel ?? 'Copiar e-mail';
+      }, 2000);
+    } catch {
+      // Clipboard bloqueada (contexto inseguro ou permissão negada): abre o cliente de e-mail.
+      window.location.href = `mailto:${email}`;
+    }
+  });
+</script>

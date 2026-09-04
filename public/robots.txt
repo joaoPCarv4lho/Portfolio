@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+# PLACEHOLDER: ajuste o domínio se ele mudar.
+Sitemap: https://joaopauloguedes.dev/sitemap-index.xml

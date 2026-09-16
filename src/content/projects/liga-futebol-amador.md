@@ -22,7 +22,7 @@ period: '03/2026 - 04/2026'
 repo: "https://github.com/joaoPCarv4lho/frontend_manager_football_league" # PLACEHOLDER
 demo: null # PLACEHOLDER
 cover: ../../assets/projects/liga.png
-coverAlt: Capa do projeto de gestão de liga de futebol amador
+coverAlt: Três telas do app de gestão da liga — criação de partida, ranking anual com gráfico de scouts e controle financeiro
 confidential: false
 ---
 

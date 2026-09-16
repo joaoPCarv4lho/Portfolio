@@ -8,7 +8,7 @@ import { z } from 'astro/zod';
  */
 const projects = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/projects' }),
-  schema: z.object({
+  schema: ({ image }) => z.object({
     title: z.string(),
     /** Subtítulo de uma linha, exibido sob o título. */
     tagline: z.string(),
@@ -24,8 +24,13 @@ const projects = defineCollection({
     /** PLACEHOLDER: preencha quando os links existirem. null = botão desabilitado. */
     repo: z.url().nullable().default(null),
     demo: z.url().nullable().default(null),
-    /** Caminho em /public. null = card sem imagem (fallback tipográfico). */
-    cover: z.string().nullable().default(null),
+    /**
+     * Imagem em src/assets (otimizada no build pelo astro:assets).
+     * Caminho relativo ao arquivo .md. null = card sem imagem (fallback tipográfico).
+     */
+    cover: image().nullable().default(null),
+    /** Texto alternativo da capa. null = usa fallback genérico com o título. */
+    coverAlt: z.string().nullable().default(null),
     confidential: z.boolean().default(false),
   }),
 });

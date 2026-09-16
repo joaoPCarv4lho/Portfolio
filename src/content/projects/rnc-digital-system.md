@@ -33,7 +33,8 @@ featured: true
 period: '09/2025 — 11/2025'
 repo: "https://github.com/joaoPCarv4lho/frontend_rnc_digital_system"
 demo: null # PLACEHOLDER
-cover: null # PLACEHOLDER: /images/projects/rnc.png (1200×750)
+cover: ../../assets/projects/rnc.png
+coverAlt: Painel do Operador do RNC Digital System com a lista de registros de não conformidade e seus status
 confidential: true
 ---
 

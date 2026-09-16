@@ -35,7 +35,8 @@ featured: true
 period: '07/2026 — 08/2026'
 repo: null # PLACEHOLDER
 demo: null # PLACEHOLDER
-cover: null # PLACEHOLDER: /images/projects/pedidos.png (1200×750)
+cover: ../../assets/projects/pedidos.png
+coverAlt: Capa do projeto Plataforma de pedidos com WhatsApp e IA
 confidential: true
 ---
 
